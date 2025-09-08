@@ -108,7 +108,7 @@ python판 getter / setter
 setter -> 매개변수 o / 리턴 x
 getter -> 매개변수 x / 리턴 o
 '''
-# class Student:
+# class student:
 #     # setter 예시
 #     def set_name(self, name):
 #         self.name = name
