@@ -1,89 +1,113 @@
 import random
 import time
-
-from createDeck import *
-
-deck = createDeck()
-dealer_deck = []
-player_deck = []
-dealer_stand = False
-player_stand = False
-def choose_card():
-    choose = random.choice(list(deck.keys()))   # 고르기
-    deck.pop(choose)  # 덱에서 고른거 빼기
-    return choose
+from createDeck import createDeck
 
 
-def cal_score(who_deck):
-    score = 0
-    for card in who_deck:
-        score += (createDeck().get(card))
-    return score
+# 덱 클래스
+class Deck:
+    def __init__(self):
+        self.cards = createDeck()
 
-def hit(who_deck):
-    card = choose_card()
-    who_deck.append(card)
-    print(f'뽑으신 카드 : {card}')
-    print(f'현재 점수 : {cal_score(who_deck)}')
+    def draw(self):
+        choose = random.choice(list(self.cards.keys()))
+        self.cards.pop(choose)  # 뽑은 카드는 덱에서 제거
+        return choose
 
 
-def start_game():
-    dealer_deck.append(choose_card())
-    player_deck.append(choose_card())
+# 공통 플레이어 클래스
+class BasePlayer:
+    def __init__(self, name):
+        self.name = name
+        self.hand = []
+        self.stand = False
 
-    print('카드를 한장씩 받으셨습니다.')
-    show_info()
+    def hit(self, deck: Deck):
+        card = deck.draw()
+        self.hand.append(card)
+        print(f"{self.name} 뽑은 카드: {card}")
+        print(f"{self.name} 현재 점수: {self.calc_score()}")
 
-def show_info():
-    print('======================')
-    print(f'플레이어 카드 -> {cal_score(player_deck)}점')
-    for card in player_deck: print(card, end=' ')
-    print()
-    print(f'딜러 카드 -> {cal_score(dealer_deck)}점')
-    for card in dealer_deck: print(card, end=' ')
-    print('\n======================')
+    def calc_score(self):
+        score = 0
+        for card in self.hand:
+            score += createDeck().get(card)  # 카드 점수 가져오기
+        return score
 
-def result():
-    if (dealer_stand and player_stand) or (cal_score(dealer_deck) > 21 or cal_score(player_deck) > 21):
-        dealer_score = cal_score(dealer_deck)
-        player_score = cal_score(player_deck)
-        # 21 초과(Bust) 처리
-        if player_score > 21:
-            winner = '딜러'
-        elif dealer_score > 21:
-            winner = '플레이어'
-        else:
-            winner = '딜러' if dealer_score > player_score else '무승부' if dealer_score == player_score else '플레이어'
-        print(f'{winner} 우승 !!!')
-        return True
+    def show_hand(self):
+        print(f"{self.name} 카드 -> {self.calc_score()}점")
+        for card in self.hand:
+            print(card, end=" ")
+        print("\n======================\n")
+
+
+# 사용자(Player)
+class Player(BasePlayer):
+    def action(self, deck: Deck):
+        if not self.stand:
+            print("1. Hit  2. Stand")
+            choice = int(input("고르세요 >> "))
+            if choice == 1:
+                self.hit(deck)
+            elif choice == 2:
+                print(f"{self.name} Stand 선택")
+                self.stand = True
+
+
+# 딜러(Dealer)
+class Dealer(BasePlayer):
+    def action(self, deck: Deck):
+        if not self.stand:
+            if self.calc_score() <= 16:
+                print("딜러 Hit")
+                self.hit(deck)
+            else:
+                print("딜러 Stand 선택")
+                self.stand = True
+
+
+# 결과 판정
+def result(player: Player, dealer: Dealer):
+    player_score = player.calc_score()
+    dealer_score = dealer.calc_score()
+
+    if player_score > 21:
+        winner = "딜러"
+    elif dealer_score > 21:
+        winner = "플레이어"
     else:
-        return False
-start_game()
-while True:
-    if not player_stand:
-        print('1. hit 2. stand')
-        choose = int(input('고르세요 >> '))
-        print('======================')
-        if choose == 1:
-            print('hit을 선택하셨습니다. 플레이어 카드 뽑습니다.')
-            hit(player_deck)
-        elif choose == 2:
-            print('플레이어 stand 선택.')
-            player_stand = True
-
-    if not dealer_stand:
-        if cal_score(dealer_deck) <= 16:
-            print('hit을 선택하셨습니다. 딜러 카드 뽑습니다.')
-            hit(dealer_deck)
+        if player_score > dealer_score:
+            winner = "플레이어"
+        elif dealer_score > player_score:
+            winner = "딜러"
         else:
-            print('딜러 stand 선택.')
-            dealer_stand = True
-    time.sleep(3)
+            winner = "무승부"
 
-    if result():
-        break
-
-    show_info()
-
+    print(f"=== 최종 결과 ===")
+    player.show_hand()
+    dealer.show_hand()
+    print(f"우승: {winner} 🏆")
+    return True
 
 
+# 게임 실행
+def start_game():
+    deck = Deck()
+    player = Player("플레이어")
+    dealer = Dealer("딜러")
+
+    # 카드 한 장씩 나눠주기
+    player.hit(deck)
+    dealer.hit(deck)
+
+    while True:
+        player.action(deck)
+        dealer.action(deck)
+        time.sleep(1)
+
+        if (player.stand and dealer.stand) or player.calc_score() > 21 or dealer.calc_score() > 21:
+            result(player, dealer)
+            break
+
+
+if __name__ == "__main__":
+    start_game()
