@@ -64,7 +64,7 @@ Python 프로그래밍 기초부터 객체지향까지
 * 염소 비공개/선택 유지 및 변경 시뮬레이션
 * 확률 계산 및 결과 시각화
 
-### 📝 Todo 앱 (`Practice/Todos/`)
+### 📝 Todo 리스트 (`Practice/Todos/`)
 * 콘솔 기반 Todo 관리 (추가/조회/상태 변경/삭제) → `todos.py`
 * 데이터 구조: 리스트 + 딕셔너리 (`task`, `done`)
 * JSON 저장/불러오기: `todo.json` 사용, 파일 없음/빈 파일 처리 가능
