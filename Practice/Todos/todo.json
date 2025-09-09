@@ -1,0 +1,10 @@
+[
+  {
+    "task": "공부",
+    "done": false
+  },
+  {
+    "task": "밥",
+    "done": true
+  }
+]
