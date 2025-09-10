@@ -1,40 +1,11 @@
 MENU = {
-    '에스프레소' : {
-        '재료': {
-            '물': 50,
-            '커피': 18,
-        },
-        '가격': 1.5,
-    },
-    '라떼' : {
-        '재료': {
-            '물': 200,
-            '우유': 150,
-            '커피': 24,
-        },
-        '가격': 2.5,
-    },
-    '카푸치노' : {
-        '재료': {
-            '물': 250,
-            '우유': 100,
-            '커피': 24,
-        },
-        '가격': 3.0,
-    },
+    '에스프레소': {'재료': {'물': 50, '커피': 18}, '가격': 1.5},
+    '라떼': {'재료': {'물': 200, '우유': 150, '커피': 24}, '가격': 2.5},
+    '카푸치노': {'재료': {'물': 250, '우유': 100, '커피': 24}, '가격': 3.0},
 }
-resources = {
-    '물': 300,
-    '우유': 200,
-    '커피': 100,
-    '돈': 0,
-}
-coin = {
-    'quarters': 0.25,
-    'dimes': 0.10,
-    'nickels': 0.05,
-    'pennies': 0.01,
-}
+resources = {'물': 300, '우유': 200, '커피': 100, '돈': 0}
+coin = {'quarters': 0.25, 'dimes': 0.10, 'nickels': 0.05, 'pennies': 0.01}
+
 #  재료와 돈 계산 함수
 def can_buy_check(order):
     check = True
@@ -66,6 +37,11 @@ def import_coin(order):
                 if coin_name in coin.keys():
                     money += coin[coin_name]*coin_count
                     print(f'현재 넣은 돈 : {money}')
+            elif len(parts) == 1:
+                coin_name = parts[0]
+                if coin_name in coin.keys():
+                    money += coin[coin_name]
+                    print(f'현재 넣은 돈 : {money}')
             else:
                 print('다시 입력하세요')
         elif import_c == '':
@@ -89,33 +65,31 @@ def minus_material(order):
     for item in MENU[order]['재료']:
         resources[item] -= MENU[order]['재료'][item]
 
-def start_machine():
-    while True:
-        order = input('무엇을 드시겠습니까? (에스프레소/라떼/카푸치노) ')
-        # 관리자 명령어
-        if order == 'admin':
-            print('관리자 명령어 : off report')
-            continue
-        elif order == "off":
-            print('종료되었습니다.')
-            break
-        elif order == "report":
-            report_resources()
-            continue
-        #옳바르게  입력했는지 확인
-        if order not in MENU:
-            print('옳바르지 않은 입력입니다.')
-            continue
 
-        # 구매 가능한지 체크
-        if can_buy_check(order):
-            if import_coin(order):
-                minus_material(order)
-                print(f'여기 {order}가 나왔습니다. 맛있게 드세요!')
-            else:
-                print(f'{order} 구매 실패')
+while True:
+    order = input('무엇을 드시겠습니까? (에스프레소/라떼/카푸치노) ')
+    # 관리자 명령어
+    if order == 'admin':
+        print('관리자 명령어 : off report')
+        continue
+    elif order == "off":
+        print('종료되었습니다.')
+        break
+    elif order == "report":
+        report_resources()
+        continue
+    #옳바르게  입력했는지 확인
+    if order not in MENU:
+        print('옳바르지 않은 입력입니다.')
+        continue
+
+    # 구매 가능한지 체크
+    if can_buy_check(order):
+        if import_coin(order):
+            minus_material(order)
+            print(f'여기 {order}가 나왔습니다. 맛있게 드세요!')
         else:
-            print(f'{order} 구매 불가')
+            print(f'{order} 구매 실패')
+    else:
+        print(f'{order} 구매 불가')
 
-if __name__ == '__main__':
-    start_machine()

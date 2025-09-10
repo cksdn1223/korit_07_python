@@ -3,7 +3,6 @@ MENU = {
     '라떼': {'재료': {'물': 200, '우유': 150, '커피': 24}, '가격': 2.5},
     '카푸치노': {'재료': {'물': 250, '우유': 100, '커피': 24}, '가격': 3.0},
 }
-coin = {'쿼터': 0.25, '다임': 0.10, '니켈': 0.05, '페니': 0.01}
 profit = 0
 resources = {'물': 300, '우유': 200, '커피': 100}
 
@@ -17,22 +16,14 @@ def is_resources_enough(order_ingredient):
     return check
 
 def process_coins():
-    # 쿼터, 다임, 니켈, 페니 네종류의 동전
     sum = 0
-    # print('쿼터: 0.25, 다임: 0.10, 니켈: 0.05, 페니: 0.01')
-    # print(f'{order}에 필요한 가격 : {MENU[order]['가격']}')
-    # for i in coin.keys():
-    #     input_coin = int(input(f'{i} 몇개 ? >> '))
-    #     sum += input_coin * coin[i]
-    #     print(f'현재 넣은 가격 : {sum}')
     sum += float(input('쿼터 몇개 ? ')) * 0.25
     sum += float(input('다임 몇개 ? ')) * 0.10
     sum += float(input('니켈 몇개 ? ')) * 0.05
     sum += float(input('페니 몇개 ? ')) * 0.01
     return sum
-#todo -6 : 돈전처리 왜 ? 계산된 sum 가지고 총합이 선택한 음료가격보다 높다면 다음과정진행
+
 def is_transaction_successful(money_received, drink_cost):
-    '''process_coins() 결과값 음료가격 매개변수로받아 동전총합이 음료가격보다 높으면 true 아니면 false / true인경우 profit에 음료가격만큼 추가 false인경우 동전반환'''
     change = money_received - drink_cost
     if change >= 0:
         global profit   # 전역 변수인 profit을 함수 내부에서 사용하기 위한 키워드
@@ -48,8 +39,6 @@ def make_coffe(drink_name, order_ingredient):
         resources[item] -= order_ingredient[item]
     print(f'{drink_name}이(가) 나왔습니다. 맛있게 드세요 !!')
 
-#todo -1 : 커피 머신 반복적 돌아감 off 입력 종료
-#todo -2 : report 입력 현재 자원값 보여줌
 is_on = True
 while is_on:
     choice = input('어떤 음료를 드시겠습니까? (에스프레소 / 라떼 / 카푸치노) >>> ')
@@ -61,16 +50,14 @@ while is_on:
             print(f'{resource} : {resources[resource]}'
                   f'{'g' if resource == '커피' else 'ml' if resource != '돈' else ''}')
         print(f'돈 : ${profit:.2f}')
-    # todo -4 : 에스프레소 라떼 카푸치노 중 하나 일대
     elif choice in MENU:
-        if is_resources_enough(MENU[choice]['재료']):
+        drink = MENU[choice]
+        if is_resources_enough(drink['재료']):
             money_received = process_coins()
-            if is_transaction_successful(money_received=money_received, drink_cost=MENU[choice]['가격']):
-                make_coffe(drink_name=choice, order_ingredient=MENU[choice]['재료'])
+            if is_transaction_successful(money_received=money_received, drink_cost=drink['가격']):
+                make_coffe(drink_name=choice, order_ingredient=drink['재료'])
         else:
             print(f'{choice} 구매 불가')
-
-    # todo -5 : choice가 이상조건 충족하지않을대 잘못입력 다시입력 출력
     else:
         print('잘못 입력하셨습니다. 다시 입력하세요.')
 
